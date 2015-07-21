@@ -1,0 +1,80 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<script src="../bower_components/masonry/dist/masonry.pkgd.min.js"></script>
+<script src="../bower_components/imagesloaded/imagesloaded.pkgd.min.js"></script>
+
+<dom-module id="mason-ry">
+	<style>
+		:host { display: block; }
+	</style>
+	<template>
+		<content></content>
+	</template>
+</dom-module>
+
+<script>
+	'use strict';
+
+	Polymer({
+		is: 'mason-ry',
+		properties: {
+			masonry: { type: Object },
+			itemSelector: { type: String, observer: 'restart' },
+			columnWidth: { type: Object, observer: 'restart' },
+			gutter: { type: Number, observer: 'restart' },
+			percentPosition: { type: Boolean, observer: 'restart' },
+			stamp: { type: String, observer: 'restart' },
+			isFitWidth: { type: Boolean, observer: 'restart' },
+			isOriginLeft: { type: Boolean, value: true, observer: 'restart' },
+			isOriginTop: { type: Boolean, value: true, observer: 'restart' },
+			transitionDuration: { type: String, value: '0.4s', observer: 'restart' },
+			isResizeBound: { type: Boolean, value: true, observer: 'restart' },
+		},
+
+		ready: function() {
+			this.restart();
+		},
+		detached: function() {
+			this.masonry.destroy();
+		},
+
+		reload: function() {
+			this.masonry.reloadItems();
+			imagesLoaded(this, function() {
+				for (var i = 0; i <= 1000; i += 250) {
+					setTimeout(this.layout.bind(this), i);
+				}
+			}.bind(this));
+		},
+		layout: function() {
+			this.debounce('layout', function() {
+				this.masonry.layout();
+			}.bind(this));
+		},
+		stampElements: function(els) {
+			return this.masonry.stamp(els);
+		},
+		unstampElements: function(els) {
+			return this.masonry.unstamp(els);
+		},
+
+		restart: function() {
+			this.debounce('restart', function() {
+				if (this.masonry !== undefined)
+					this.masonry.destroy()
+				this.masonry = new Masonry(this, {
+					itemSelector: this.itemSelector,
+					columnWidth: this.columnWidth,
+					gutter: this.gutter,
+					percentPosition: this.percentPosition,
+					stamp: this.stamp,
+					isFitWidth: this.isFitWidth,
+					isOriginLeft: this.isOriginLeft,
+					isOriginTop: this.isOriginTop,
+					transitionDuration: this.transitionDuration,
+					isResizeBound: this.isResizeBound,
+				});
+			}.bind(this));
+		},
+	});
+</script>	
